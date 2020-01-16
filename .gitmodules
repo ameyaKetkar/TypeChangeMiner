@@ -1,9 +1,6 @@
 [submodule "JarAnalyzer"]
 	path = JarAnalyzer
 	url = https://github.com/ameyaKetkar/JarAnalyzer.git
-[submodule "RefactoringMiner"]
-	path = RefactoringMiner
-	url = https://github.com/ChangeType/RefactoringMiner.git
 [submodule "Models"]
 	path = Models
 	url = https://github.com/ameyaKetkar/Models.git
