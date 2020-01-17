@@ -4,3 +4,6 @@
 [submodule "Models"]
 	path = Models
 	url = https://github.com/ameyaKetkar/Models.git
+[submodule "RefactoringMiner"]
+	path = RefactoringMiner
+	url = https://github.com/ChangeType/RefactoringMiner.git
