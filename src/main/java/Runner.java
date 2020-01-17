@@ -1,3 +1,5 @@
+import com.t2r.common.models.ast.TypeGraphOuterClass;
+import com.t2r.common.models.ast.TypeGraphOuterClass.TypeGraph;
 import com.t2r.common.models.refactorings.CommitInfoOuterClass.CommitInfo;
 import com.t2r.common.utilities.ProtoUtil.ReadWriteAt;
 import io.vavr.Tuple;
@@ -138,7 +140,7 @@ public class Runner {
                     Try.of(() -> Files.write(resolved,tc.getBytes(), StandardOpenOption.APPEND));
                     System.out.print(tc);
                     if(x.getRealTypeChanges()!=null && x.getRealTypeChanges().get(0)!=null) {
-                        Tuple3<TypeGraphOuterClass.TypeGraph, TypeGraphOuterClass.TypeGraph, List<String>> t = x.getRealTypeChanges().get(0);
+                        Tuple3<TypeGraph, TypeGraph, List<String>> t = x.getRealTypeChanges().get(0);
 
                         if (t != null) {
                             String s = "\n" +  pretty(t._1()) + " to " + pretty(t._2()) + " Info: " + t._3().stream().collect(joining(","));
