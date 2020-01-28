@@ -13,13 +13,20 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>9</source>
-                    <target>9</target>
+                    <source>10</source>
+                    <target>10</target>
                 </configuration>
             </plugin>
         </plugins>
     </build>
     <dependencies>
+        <dependency>
+            <groupId>JarAnalyzer</groupId>
+            <artifactId>JarAnalyzer</artifactId>
+            <version>0.0.1-SNAPSHOT-Ameya</version>
+            <systemPath>${basedir}/lib/JarAnalyzer-0.0.1-SNAPSHOT-Ameya.jar</systemPath>
+            <scope>system</scope>
+        </dependency>
         <dependency>
             <groupId>TypeChange</groupId>
             <artifactId>Models</artifactId>

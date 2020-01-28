@@ -12,3 +12,5 @@ buildNumber.properties
 venv/
 .idea/
 Output/
+
+.DS_Store
