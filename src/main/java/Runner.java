@@ -76,7 +76,7 @@ public class Runner {
                                 GitHistoryRefactoringMinerImpl gitHistoryRefactoringMiner = new GitHistoryRefactoringMinerImpl();
                                 final ChangeTypeMiner ctm = new ChangeTypeMiner();
                                 gitHistoryRefactoringMiner
-                                        .mineTypeChange(p._2.get().getRepository(), c._1(), ctm, pathToDependencies);
+                                        .mineTypeChange(p._2.get(), c._1(), ctm, pathToDependencies);
                             });
                 }
             });
