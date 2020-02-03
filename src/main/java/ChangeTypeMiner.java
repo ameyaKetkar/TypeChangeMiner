@@ -1,25 +1,3 @@
-import static com.t2r.common.models.ast.TypeNodeOuterClass.TypeNode.TypeKind.Simple;
-import static com.t2r.common.models.refactorings.NameSpaceOuterClass.NameSpace.DontKnow;
-import static com.t2r.common.models.refactorings.NameSpaceOuterClass.NameSpace.External;
-import static com.t2r.common.models.refactorings.NameSpaceOuterClass.NameSpace.Internal;
-import static com.t2r.common.models.refactorings.NameSpaceOuterClass.NameSpace.Jdk;
-import static com.t2r.common.models.refactorings.NameSpaceOuterClass.NameSpace.TypeVariable;
-import static com.t2r.common.models.refactorings.TypeSemOuterClass.TypeSem.Dont_Know;
-import static com.t2r.common.models.refactorings.TypeSemOuterClass.TypeSem.Enum;
-import static com.t2r.common.models.refactorings.TypeSemOuterClass.TypeSem.Object;
-import static com.t2r.common.models.refactorings.TypeSemOuterClass.TypeSem.PrimitiveType;
-import static com.t2r.common.utilities.PrettyPrinter.pretty;
-import static com.t2r.common.utilities.PrettyPrinter.prettyLIST;
-import static gr.uom.java.xmi.TypeFactMiner.TypFct.getDependencyInfo;
-import static gr.uom.java.xmi.decomposition.UMLOperationBodyMapper.isRelevant;
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.counting;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toSet;
-import static java.util.stream.Stream.concat;
-
 import com.t2r.common.models.ast.TypeGraphOuterClass.TypeGraph;
 import com.t2r.common.models.ast.TypeNodeOuterClass.TypeNode;
 import com.t2r.common.models.refactorings.CodeStatisticsOuterClass.CodeStatistics;
@@ -37,25 +15,31 @@ import com.t2r.common.models.refactorings.TypeChangeCommitOuterClass.TypeChangeC
 import com.t2r.common.models.refactorings.TypeChangeCommitOuterClass.TypeChangeCommit.MigrationAnalysis;
 import com.t2r.common.models.refactorings.TypeSemOuterClass.TypeSem;
 import com.t2r.common.utilities.PrettyPrinter;
-
+import gr.uom.java.xmi.TypeFactMiner.ExtractHierarchyPrimitiveCompositionInfo;
+import gr.uom.java.xmi.TypeFactMiner.GlobalContext;
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringHandler;
 import org.refactoringminer.api.TypeRelatedRefactoring;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Stream;
 
-import gr.uom.java.xmi.TypeFactMiner.ExtractHierarchyPrimitiveCompositionInfo;
-import gr.uom.java.xmi.TypeFactMiner.GlobalContext;
-import io.vavr.Tuple;
-import io.vavr.Tuple2;
+import static com.t2r.common.models.ast.TypeNodeOuterClass.TypeNode.TypeKind.Simple;
+import static com.t2r.common.models.refactorings.NameSpaceOuterClass.NameSpace.*;
+import static com.t2r.common.models.refactorings.TypeSemOuterClass.TypeSem.Enum;
+import static com.t2r.common.models.refactorings.TypeSemOuterClass.TypeSem.Object;
+import static com.t2r.common.models.refactorings.TypeSemOuterClass.TypeSem.*;
+import static com.t2r.common.utilities.PrettyPrinter.pretty;
+import static com.t2r.common.utilities.PrettyPrinter.prettyLIST;
+import static gr.uom.java.xmi.TypeFactMiner.TypFct.getDependencyInfo;
+import static gr.uom.java.xmi.decomposition.UMLOperationBodyMapper.isRelevant;
+import static java.util.stream.Collectors.*;
+import static java.util.stream.Stream.concat;
 
 public class ChangeTypeMiner extends RefactoringHandler {
 
@@ -82,8 +66,17 @@ public class ChangeTypeMiner extends RefactoringHandler {
 
     @Override
     public void handle(CommitInfo c, List<Refactoring> refactorings, Tuple2<GlobalContext, GlobalContext> globalContexts, CodeStatistics cs){
+
+        TypeChangeCommit.Builder tcc = TypeChangeCommit.newBuilder()
+                .setSha(c.getSha())
+                .setDependencyUpdate(c.getDependencyUpdate())
+                .setFileDiff(c.getFileDiff())
+                .putAllRefactorings(getAllRefactoringsInCommit(c));
+
+
         if (refactorings.isEmpty() || refactorings.stream().noneMatch(Refactoring::isTypeRelatedChange)) {
             System.out.println("No CTT");
+            Runner.readWriteOutputProtos.write(tcc.build(), "TypeChangeCommit_"+project.getName(), true);
             return;
         }
 
@@ -95,13 +88,7 @@ public class ChangeTypeMiner extends RefactoringHandler {
 
         if (typeChangeAnalysisList.isEmpty()) {
             System.out.println("NO Type Changes found");
-            TypeChangeCommit tcc = TypeChangeCommit.newBuilder()
-                    .setSha(c.getSha())
-                    .setDependencyUpdate(c.getDependencyUpdate())
-                    .setFileDiff(c.getFileDiff())
-                    .putAllRefactorings(getAllRefactoringsInCommit(c))
-                    .build();
-            Runner.readWriteOutputProtos.write(tcc, "TypeChangeCommit_"+project.getName(), true);
+            Runner.readWriteOutputProtos.write(tcc.build(), "TypeChangeCommit_"+project.getName(), true);
             return;
         }
 
