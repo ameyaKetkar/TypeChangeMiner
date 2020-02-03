@@ -108,7 +108,7 @@ public class ChangeTypeMiner extends RefactoringHandler {
                     + x.getTypeB4().getTypeStr() + "  ---->   " + x.getTypeAfter().getTypeStr() + "\n");
         });
 
-        Runner.readWriteOutputProtos.write(typeChangeCommit, "TypeChangeCommit", true);
+        Runner.readWriteOutputProtos.write(typeChangeCommit, "TypeChangeCommit_"+project.getName(), true);
 
         System.out.println("-------------------------------");
         System.out.println();
