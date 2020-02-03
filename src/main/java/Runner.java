@@ -1,13 +1,8 @@
-import static com.t2r.common.utilities.GitUtil.findCommit;
-import static com.t2r.common.utilities.GitUtil.tryToClone;
-import static java.util.stream.Collectors.toList;
-import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal;
-
 import com.t2r.common.models.refactorings.CommitInfoOuterClass.CommitInfo;
 import com.t2r.common.models.refactorings.ProjectOuterClass.Project;
 import com.t2r.common.models.refactorings.TypeChangeCommitOuterClass.TypeChangeCommit;
 import com.t2r.common.utilities.ProtoUtil.ReadWriteAt;
-
+import io.vavr.Tuple;
 import org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.refactoringminer.rm1.GitHistoryRefactoringMinerImpl;
@@ -27,7 +22,10 @@ import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import io.vavr.Tuple;
+import static com.t2r.common.utilities.GitUtil.findCommit;
+import static com.t2r.common.utilities.GitUtil.tryToClone;
+import static java.util.stream.Collectors.toList;
+import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal;
 
 public class Runner {
     private static final Logger LOGGER = Logger.getLogger("Runner");
@@ -81,7 +79,7 @@ public class Runner {
                             .filter(x -> !analyzedCommits.contains(x.getSha()))
                             .map(x -> Tuple.of(x,findCommit(x.getSha(), p._2.get().getRepository())))
                             .filter(x->x._2().isPresent())
-//                            .filter(x -> x._2().map(r -> r.getId().getName().equals("65896c79377b4776fe065211eda559f4c0683aae")).orElse(false))
+                       //     .filter(x -> x._2().map(r -> r.getId().getName().equals("6151fec89a02ef41e499c10fd3732862a06e8be0")).orElse(false))
                             .forEach(c -> {
                                 GitHistoryRefactoringMinerImpl gitHistoryRefactoringMiner = new GitHistoryRefactoringMinerImpl(gr);
                                 final ChangeTypeMiner ctm = new ChangeTypeMiner(p._1()._1());
