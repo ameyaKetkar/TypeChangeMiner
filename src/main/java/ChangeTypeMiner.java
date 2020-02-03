@@ -79,6 +79,13 @@ public class ChangeTypeMiner extends RefactoringHandler {
 
         if (typeChangeAnalysisList.isEmpty()) {
             System.out.println("NO Type Changes found");
+            TypeChangeCommit tcc = TypeChangeCommit.newBuilder()
+                    .setSha(c.getSha())
+                    .setDependencyUpdate(c.getDependencyUpdate())
+                    .setFileDiff(c.getFileDiff())
+                    .putAllRefactorings(getAllRefactoringsInCommit(c))
+                    .build();
+            Runner.readWriteOutputProtos.write(tcc, "TypeChangeCommit_"+project.getName(), true);
             return;
         }
 

@@ -1,5 +1,6 @@
 import com.t2r.common.models.refactorings.CommitInfoOuterClass.CommitInfo;
 import com.t2r.common.models.refactorings.ProjectOuterClass.Project;
+import com.t2r.common.models.refactorings.TypeChangeCommitOuterClass.TypeChangeCommit;
 import com.t2r.common.utilities.ProtoUtil.ReadWriteAt;
 import io.vavr.Tuple;
 import org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection;
@@ -14,6 +15,7 @@ import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 import java.util.function.Function;
 import java.util.logging.FileHandler;
@@ -22,6 +24,7 @@ import java.util.logging.SimpleFormatter;
 
 import static com.t2r.common.utilities.GitUtil.findCommit;
 import static com.t2r.common.utilities.GitUtil.tryToClone;
+import static java.util.stream.Collectors.toList;
 import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal;
 
 public class Runner {
@@ -64,16 +67,19 @@ public class Runner {
 
     public static void main(String[] args)  {
        readWriteInputProtos.<Project>readAll("Projects", "Project").stream()
-                .filter( p -> p.getName().contains("guava"))
+//                .filter( p -> p.getName().contains("guava"))
             .map(prc -> Tuple.of(prc, readWriteInputProtos.<CommitInfo>readAll("commits_" + prc.getName(), "CommitInfo")))
             .map(x -> Tuple.of(x,tryToClone(x._1().getUrl(), projectPath.apply(x._1().getName()).toAbsolutePath())))
             .forEach(p -> {
+                List<String> analyzedCommits = readWriteOutputProtos.<TypeChangeCommit>readAll("TypeChangeCommit_" + p._1()._1().getName(), "TypeChangeCommit")
+                        .stream().map(x -> x.getSha()).collect(toList());
                 if (p._2().isSuccess()){
                     System.out.println("Analysing " + p._1()._1());
-                    p._1()._2().stream().filter(x->x.getRefactoringsCount() > 0 && x.getIsTypeChangeReported() )
+                    p._1()._2().stream().filter(x->x.getRefactoringsCount() > 0 && x.getIsTypeChangeReported())
+                            .filter(x -> !analyzedCommits.contains(x.getSha()))
                             .map(x -> Tuple.of(x,findCommit(x.getSha(), p._2.get().getRepository())))
                             .filter(x->x._2().isPresent())
-//                            .filter(x -> x._2().map(r -> r.getId().getName().equals("f438db66650063f9faa91c592054873c8392e512")).orElse(false))
+                            .filter(x -> x._2().map(r -> r.getId().getName().equals("65896c79377b4776fe065211eda559f4c0683aae")).orElse(false))
                             .forEach(c -> {
                                 GitHistoryRefactoringMinerImpl gitHistoryRefactoringMiner = new GitHistoryRefactoringMinerImpl(gr);
                                 final ChangeTypeMiner ctm = new ChangeTypeMiner(p._1()._1());
