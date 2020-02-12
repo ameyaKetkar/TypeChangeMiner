@@ -76,7 +76,7 @@ public class Runner {
                 if (p._2().isSuccess()){
                     System.out.println("Analysing " + p._1()._1());
                     p._1()._2().stream().filter(x->x.getRefactoringsCount() > 0 && x.getIsTypeChangeReported())
-                            .filter(x -> !analyzedCommits.contains(x.getSha()))
+//                            .filter(x -> !analyzedCommits.contains(x.getSha()))
                             .map(x -> Tuple.of(x,findCommit(x.getSha(), p._2.get().getRepository())))
                             .filter(x->x._2().isPresent())
                        //     .filter(x -> x._2().map(r -> r.getId().getName().equals("6151fec89a02ef41e499c10fd3732862a06e8be0")).orElse(false))

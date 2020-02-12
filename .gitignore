@@ -17,3 +17,5 @@ Input/
 .DS_Store
 
 paths.properties
+
+*.kryo
