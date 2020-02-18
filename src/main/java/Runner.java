@@ -40,6 +40,7 @@ public class Runner {
     public static Path pathToInput;
     public static Path pathToDependencies;
     public static ReadWriteAt readWriteOutputProtos;
+    public static ReadWriteAt readWriteCodeMappingProtos;
     public static GraphTraversalSource gr;
 
     static{
@@ -59,6 +60,7 @@ public class Runner {
             pathToInput = Paths.get(".").toAbsolutePath().resolve(prop.getProperty("PathToInput"));
             readWriteInputProtos = new ReadWriteAt(pathToInput.resolve("ProtosOut"));
             readWriteOutputProtos = new ReadWriteAt(outputFolder);
+            readWriteCodeMappingProtos = new ReadWriteAt(outputFolder.resolve("CodeMapping"));
             pathToDependencies = pathToInput.resolve("dependencies");
         } catch (IOException | ParseException e) {
             e.printStackTrace();
