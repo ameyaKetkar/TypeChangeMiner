@@ -7,3 +7,6 @@
 [submodule "RefactoringMiner"]
 	path = RefactoringMiner
 	url = https://github.com/ChangeType/RefactoringMiner.git
+[submodule "gumtree"]
+	path = gumtree
+	url = https://github.com/ameyaKetkar/gumtree.git
