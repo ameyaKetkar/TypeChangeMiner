@@ -41,6 +41,7 @@ public class Runner {
     public static Path pathToDependencies;
     public static ReadWriteAt readWriteOutputProtos;
     public static ReadWriteAt readWriteCodeMappingProtos;
+    public static ReadWriteAt readWriteMigrationProtos;
     public static GraphTraversalSource gr;
 
     static{
@@ -61,6 +62,7 @@ public class Runner {
             readWriteInputProtos = new ReadWriteAt(pathToInput.resolve("ProtosOut"));
             readWriteOutputProtos = new ReadWriteAt(outputFolder);
             readWriteCodeMappingProtos = new ReadWriteAt(outputFolder.resolve("CodeMapping"));
+            readWriteMigrationProtos = new ReadWriteAt(outputFolder.resolve("Migration"));
             pathToDependencies = pathToInput.resolve("dependencies");
         } catch (IOException | ParseException e) {
             e.printStackTrace();

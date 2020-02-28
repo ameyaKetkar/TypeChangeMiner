@@ -10,7 +10,7 @@ import com.t2r.common.models.ast.TypeGraphOuterClass.TypeGraph;
 import com.t2r.common.models.refactorings.ProcessedCodeMappingsOuterClass.ProcessedCodeMappings;
 import com.t2r.common.models.refactorings.ProcessedCodeMappingsOuterClass.ProcessedCodeMappings.ExpressionMapping;
 import com.t2r.common.models.refactorings.ProcessedCodeMappingsOuterClass.ProcessedCodeMappings.RelevantStmtMapping;
-import com.t2r.common.models.refactorings.ProjectOuterClass;
+import com.t2r.common.models.refactorings.ProjectOuterClass.Project;
 import com.t2r.common.models.refactorings.TypeChangeAnalysisOuterClass.TypeChangeAnalysis;
 import com.t2r.common.models.refactorings.TypeChangeAnalysisOuterClass.TypeChangeAnalysis.CodeMapping;
 import com.t2r.common.models.refactorings.TypeChangeAnalysisOuterClass.TypeChangeAnalysis.TypeChangeInstance;
@@ -44,14 +44,15 @@ public class AnalyseChangePatterns {
     public static void main(String a[]) {
 
 
-        Runner.readWriteOutputProtos.write(CodeMapping.newBuilder().setB4("blah").build(), "CodeMapping", true);
+//        List<ProcessedCodeMappings> processedCodeMappings = Runner.readWriteCodeMappingProtos.readAll("ProcessedCodeMapping", "CodeMapping");
 
+        ArrayList<Project> projects = new ArrayList<>(Runner.readWriteInputProtos.<Project>readAll("Projects", "Project"));
 
-        var typeChangeAnalysiss = new ArrayList<>(Runner.readWriteInputProtos.<ProjectOuterClass.Project>readAll("Projects", "Project"))
-                .stream()
-//                .filter(x -> x.getName().equals("guava"))
-                .flatMap(z -> Runner.readWriteOutputProtos.<TypeChangeCommit>readAll("TypeChangeCommit_" + z.getName(), "TypeChangeCommit")
-                        .stream()).flatMap(tcc -> tcc.getTypeChangesList().stream())
+        List<Tuple2<Project, List<TypeChangeCommit>>> procect_tcc = projects.stream()
+                .map(z -> Tuple.of(z,Runner.readWriteOutputProtos.<TypeChangeCommit>readAll("TypeChangeCommit_" + z.getName(), "TypeChangeCommit")))
+                .collect(toList());
+
+        var typeChangeAnalysiss = procect_tcc.stream().flatMap(x -> x._2().stream()).flatMap(tcc -> tcc.getTypeChangesList().stream())
                 .filter(e -> !e.getB4().getRoot().getIsTypeVariable() && !e.getAftr().getRoot().getIsTypeVariable())
                 .collect(toList());
 
@@ -64,37 +65,49 @@ public class AnalyseChangePatterns {
 
         System.out.println(groupedTci.size());
 
-        List<ProcessedCodeMappings> processedCodeMappings = groupedTci.parallelStream()
-                .map(Tuple::fromEntry)
-                .map(x -> ProcessedCodeMappings.newBuilder()
-                        .setB4(x._1()._1()).setAftr(x._1()._2()).addAllRelevantStmts(tciAnalysis(x._2())).build())
+        List<ProcessedCodeMappings> processedCodeMappings =
+                Runner.readWriteCodeMappingProtos.readAll("ProcessedCodeMapping", "CodeMapping");
+//                groupedTci.parallelStream()
+//                .map(Tuple::fromEntry)
+//                .map(x -> ProcessedCodeMappings.newBuilder()
+//                        .setB4(x._1()._1()).setAftr(x._1()._2()).addAllRelevantStmts(tciAnalysis(x._2())).build())
+//                .collect(toList());
+
+//        processedCodeMappings.forEach(f -> Runner.readWriteCodeMappingProtos.write(f, "ProcessedCodeMapping", true));
+
+
+        List<Tuple2<Tuple2<TypeGraph, TypeGraph>, RelevantStmtMapping>> tciMappings = processedCodeMappings.stream()
+                .flatMap(pc -> pc.getRelevantStmtsList().stream().map(x -> Tuple.of(Tuple.of(pc.getB4(), pc.getAftr()), x)))
+                .filter(x -> x._2().getMappingCount() > 0)
                 .collect(toList());
 
-        processedCodeMappings.forEach(f -> Runner.readWriteCodeMappingProtos.write(f, "ProcessedCodeMapping", true));
 
 
-        List<Tuple2<Tuple2<TypeGraph, TypeGraph>, Map<String, Long>>> z = processedCodeMappings.stream()
-                .map(x -> Tuple.of(Tuple.of(x.getB4(), x.getAftr())
-                        , x.getRelevantStmtsList().stream().flatMap(r -> r.getMappingList().stream()).collect(groupingBy(m -> m.getReplacement(), counting()))))
+        List<Tuple2<Tuple2<TypeGraph, TypeGraph>, Map<String, Long>>> tciMappingsAsStr =
+                tciMappings.stream().map(z -> z.map2(r -> r.getMappingList().stream().collect(groupingBy(m -> m.getReplacement(), counting()))))
                 .collect(toList());
 
-        Map<String, List<Tuple2<Tuple2<TypeGraph, TypeGraph>, Map<String, Long>>>> labelledTypeChanges = z.stream()
+        Map<String, List<Tuple2<Tuple2<TypeGraph, TypeGraph>, Map<String, Long>>>> labelledTCI = tciMappingsAsStr.parallelStream()
                 .map(x -> Tuple.of(x._1(), Labellers.TCALabeller.apply(getTypeChangeAnalysisFor(typeChangeAnalysiss, x._1())), x._2()))
                 .collect(groupingBy(x -> x._2(), collectingAndThen(toList(), l -> l.stream().map(x -> Tuple.of(x._1(), x._3())).collect(toList()))));
 
-        long count = z.stream().filter(x -> !x._2().isEmpty()).count();
+        long count = tciMappingsAsStr.stream().filter(x -> !x._2().isEmpty()).count();
         System.out.println("Total Type Changes with edit patterns = " + count);
 
 
-        for (var ll : labelledTypeChanges.entrySet()) {
+        for (var ll : labelledTCI.entrySet()) {
             System.out.println("------------");
             System.out.println(ll.getKey());
 
-            int size = ll.getValue().size();
+
+            long size = ll.getValue().size();
+
             System.out.println("Total Type Changes : " + size);
             System.out.println("No Change found for : " + ll.getValue().stream().filter(x -> x._2().isEmpty()).count() + " Type Changes");
-            ll.getValue().stream().flatMap(x -> x._2().entrySet().stream().map(p -> Tuple.of(x._1(), p.getKey())))
-                    .collect(groupingBy(x -> x._2(), counting()))
+
+            ll.getValue().stream()
+                    .flatMap(x -> x._2().entrySet().stream().map(p -> Tuple.of(x._1(), p)))
+                    .collect(groupingBy(x -> x._2().getKey(), counting()))
                     .entrySet().stream()
                     .sorted(Comparator.comparingLong(x -> x.getValue()))
                     .forEach(e -> System.out.println("\t" + e.getKey() + ll.getKey().toLowerCase() + " --- " + (double) e.getValue() / size));
@@ -102,18 +115,18 @@ public class AnalyseChangePatterns {
         }
 
 
-        var editPatGroupedByPattern = z.stream().flatMap(x -> x._2().entrySet().stream().map(Tuple::fromEntry))
-                .collect(groupingBy(x -> x._1(), summingLong(x -> x._2())));
-
-        var groupedByTypeChange = z.stream().flatMap(x -> x._2().keySet().stream().map(g -> Tuple.of(x._1(), g)))
-                .collect(groupingBy(g -> g._2(), counting()));
-
-
-        editPatGroupedByPattern.entrySet().forEach(x -> System.out.println(x.getKey() + ", " + x.getValue()));
-        System.out.println("##################################################################################################");
-        groupedByTypeChange.entrySet().forEach(x -> System.out.println("\\newcommand{" + x.getKey() + "}{" + (double) x.getValue() / count + "\\%\\xspace"));
-
-        System.out.println(editPatGroupedByPattern);
+//        var editPatGroupedByPattern = z.stream().flatMap(x -> x._2().entrySet().stream().map(Tuple::fromEntry))
+//                .collect(groupingBy(x -> x._1(), summingLong(x -> x._2())));
+//
+//        var groupedByTypeChange = z.stream().flatMap(x -> x._2().keySet().stream().map(g -> Tuple.of(x._1(), g)))
+//                .collect(groupingBy(g -> g._2(), counting()));
+//
+//
+//        editPatGroupedByPattern.entrySet().forEach(x -> System.out.println(x.getKey() + ", " + x.getValue()));
+//        System.out.println("##################################################################################################");
+//        groupedByTypeChange.entrySet().forEach(x -> System.out.println("\\newcommand{" + x.getKey() + "}{" + (double) x.getValue() / count + "\\%\\xspace"));
+//
+//        System.out.println(editPatGroupedByPattern);
 
 
     }
@@ -130,6 +143,7 @@ public class AnalyseChangePatterns {
     public static String relabelChangePattern(String pattern) {
         if (Labellers.editPatternMAp.containsKey(pattern))
             return Labellers.editPatternMAp.get(pattern);
+        System.out.println(pattern);
         return "Other";
     }
 
@@ -151,10 +165,10 @@ public class AnalyseChangePatterns {
 //                                .map(x -> Tuple.of(r, x))
                                 .collect((toList()));
                     return new ArrayList<ExpressionMapping>();
-                }
-        ).orElseGet(() -> replacementsInferred.stream()
-                .map(x -> ExpressionMapping.newBuilder().setB4(x.getB4()).setAftr(x.getAftr()).setReplacement(x.getReplacementType()).build())
-                .collect((toList())));
+                }).orElseGet(() -> replacementsInferred.stream()
+                    .map(x -> ExpressionMapping.newBuilder()
+                            .setB4(x.getB4()).setAftr(x.getAftr()).setReplacement(x.getReplacementType()).build())
+                    .collect((toList())));
 
         if (!tci.getNameAfter().equals(tci.getNameB4())) {
             z.add(ExpressionMapping.newBuilder().setB4(tci.getNameB4()).setAftr(tci.getNameAfter()).setReplacement("VARIABLE-RENAME").build());
@@ -188,6 +202,9 @@ public class AnalyseChangePatterns {
                                 .setReplacement(x.getReplacementType() + "-Different").build());
                     }
                     return singletonList(ExpressionMapping.newBuilder().setB4(x.getB4()).setAftr(x.getAftr()).setReplacement(x.getReplacementType()).build());
+//                case "ARGUMENT_REPLACED_WITH_VARIABLE":
+                case "COMPOSITE":
+                    System.out.println();
                 default:
                     return singletonList(ExpressionMapping.newBuilder().setB4(x.getB4()).setAftr(x.getAftr()).setReplacement(x.getReplacementType()).build());
             }
@@ -221,6 +238,8 @@ public class AnalyseChangePatterns {
             TreeContext src = getTreeContext(before);
             Matcher m = Matchers.getInstance().getMatcher();
             com.github.gumtreediff.actions.EditScriptGenerator e = new com.github.gumtreediff.actions.SimplifiedChawatheScriptGenerator();
+            if(src == null ||  dst == null)
+                return new ArrayList<>();
             EditScript editScript = e.computeActions(m.match(src.getRoot(), dst.getRoot()));
             Iterator<Action> it = editScript.iterator();
             List<Tuple2<String, String>> rawActions = new ArrayList<>();

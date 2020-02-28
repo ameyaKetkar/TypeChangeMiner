@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static com.t2r.common.models.ast.TypeNodeOuterClass.TypeNode.TypeKind.Primitive;
 import static com.t2r.common.models.ast.TypeNodeOuterClass.TypeNode.TypeKind.WildCard;
 import static com.t2r.common.utilities.PrettyPrinter.pretty;
 import static java.util.Arrays.asList;
@@ -46,7 +47,7 @@ public class Labellers {
             .put("WRAP_WITH_METHOD_INVOCATION", "\\percentWrap")
             .put("METHOD_INVOCATION_ARGUMENT_WRAPPED", "\\percentWrap")
             .put("METHOD_INVOCATION_NAME_AND_ARGUMENT", "\\percentMthdRename")
-            .put("CLASS_INSTANCE_CREATION", "\\percentCascadingType")
+            .put("CLASS_INSTANCE_CREATION", "\\percentClsInstCr")
             .put("METHOD_INVOCATION_EXPRESSION", "\\percentMthdRename")
             .put("NUMBER_LITERAL", "Update Num Literal")
             .put("STRING_LITERAL", "Update String Literal")
@@ -57,14 +58,10 @@ public class Labellers {
             .put("VARIABLE-RENAME","\\percentVarRename")
             .build();
 
-
-
-
-
-
     static Function<List<TypeChangeAnalysis>, String> TCALabeller = tca -> {
 
         if (tca.isEmpty()) return "No TCA found !!! ";
+
 
         String prettyB4 = pretty(tca.stream().findFirst().get().getB4());
         String prettyAfter = pretty(tca.stream().findFirst().get().getAftr());
@@ -96,6 +93,12 @@ public class Labellers {
                         .findFirst().map(x -> "TO-FROM-ENUM"))
                 .or(() -> tca.stream()
                         .filter(TypeChangeAnalysis::getB4ComposesAfter)
+                        .filter(x -> !x.getB4().getRoot().getKind().equals(Primitive))
+                        .filter(x -> !x.getAftr().getRoot().getKind().equals(Primitive))
+                        .filter(x -> !pretty(x.getB4()).equals("java.lang.String"))
+                        .filter(x -> !pretty(x.getAftr()).equals("java.lang.String"))
+                        .filter(x -> !pretty(x.getB4()).equals("java.util.UUID"))
+                        .filter(x -> !pretty(x.getAftr()).equals("java.util.UUID"))
                         .findFirst().map(x -> "COMPOSITION"))
                 .or(() -> tca.stream()
                         .filter(x -> x.getHierarchyRelation() != null && !x.getHierarchyRelation().isEmpty() && !x.getHierarchyRelation().contains("NO"))
