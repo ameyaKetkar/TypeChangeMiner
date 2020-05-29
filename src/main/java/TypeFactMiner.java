@@ -27,7 +27,7 @@ import static com.t2r.common.utilities.GitUtil.tryToClone;
 import static java.util.stream.Collectors.toList;
 import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal;
 
-public class Runner {
+public class TypeFactMiner {
     private static final Logger LOGGER = Logger.getLogger("Runner");
     static FileHandler fh;
     public static Properties prop;
@@ -94,8 +94,6 @@ public class Runner {
                             });
                 }
             });
-
-
     }
 
 

@@ -29,11 +29,11 @@ public class MineTypeMigrationAgain {
 
     public static void main(String a[]) throws IOException {
 
-        Runner.readWriteInputProtos.<Project>readAll("Projects", "Project")
+        TypeFactMiner.readWriteInputProtos.<Project>readAll("Projects", "Project")
                 .parallelStream().forEach(prj -> {
 
             Map<TypeGraph, Double> migrationRatio = new HashMap<>();
-            List<TypeChangeCommit> tcc = Runner.readWriteOutputProtos
+            List<TypeChangeCommit> tcc = TypeFactMiner.readWriteOutputProtos
                     .readAll("TypeChangeCommit_" + prj.getName(), "TypeChangeCommit");
 
             Map<TypeGraph, List<Tuple4<String, Integer, TypeGraph, NameSpaceOuterClass.NameSpace>>> tc_commit = tcc.stream().flatMap(tc -> tc.getTypeChangesList().stream()
@@ -45,7 +45,7 @@ public class MineTypeMigrationAgain {
             System.out.println("-------------" + prj.getName() + "--------------");
             for (var tc : tc_commit.entrySet()) {
 
-                Try<Git> g = GitUtil.tryToClone("", Runner.projectPath.apply(prj.getName()).toAbsolutePath());
+                Try<Git> g = GitUtil.tryToClone("", TypeFactMiner.projectPath.apply(prj.getName()).toAbsolutePath());
                 Tuple4<String, Integer, TypeGraph, NameSpaceOuterClass.NameSpace> commitToAnalyze;
                 if (tc.getValue().size() > 1) {
                     commitToAnalyze = tc.getValue().get(0);
@@ -98,7 +98,7 @@ public class MineTypeMigrationAgain {
                                         .setSha(x._1()).addToType(x._3()).build()).collect(toList()))
                         .build();
 
-                Runner.readWriteMigrationProtos.write(md, "Migration_" + prj.getName(), true);
+                TypeFactMiner.readWriteMigrationProtos.write(md, "Migration_" + prj.getName(), true);
 
                 System.out.println(pretty(md.getType()) + "   " + md.getRatio() + "  "  + " " + md.getNamespace().name() + "  " + md.getCommitToTypeCount());
 

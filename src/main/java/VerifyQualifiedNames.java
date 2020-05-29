@@ -49,9 +49,9 @@ public class VerifyQualifiedNames {
 
         File repo = new File(pathToCorpus + "/Project_" + prjct + "/" + prjct);
 
-        List<TypeChangeCommit> commits = Runner.readWriteInputProtos.<ProjectOuterClass.Project>readAll("Projects", "Project").stream()
+        List<TypeChangeCommit> commits = TypeFactMiner.readWriteInputProtos.<ProjectOuterClass.Project>readAll("Projects", "Project").stream()
                 .filter(p -> p.getName().contains(prjct))
-                .map(prc -> Tuple.of(prc, Runner.readWriteOutputProtos.<TypeChangeCommit>readAll("TypeChangeCommit_" + prc.getName(), "TypeChangeCommit")))
+                .map(prc -> Tuple.of(prc, TypeFactMiner.readWriteOutputProtos.<TypeChangeCommit>readAll("TypeChangeCommit_" + prc.getName(), "TypeChangeCommit")))
                 .flatMap(x -> x._2().stream())
 //                .filter(x -> x.getSha().equals("a7acd431fa71b18a09310216c47cef48533fe109"))
                 .collect(toList());
@@ -77,7 +77,7 @@ public class VerifyQualifiedNames {
                             .setMatched(true)
                             .setProject(prjct)
                             .build();
-                    Runner.readWriteVerificationProtos.write(v, "Verification_" + prjct, true);
+                    TypeFactMiner.readWriteVerificationProtos.write(v, "Verification_" + prjct, true);
                     System.out.println(pretty(v.getType()) + " " + "Verified: " + v.getMatched());
                     continue;
                 }
@@ -105,7 +105,7 @@ public class VerifyQualifiedNames {
                             .setProject(prjct)
                             .setFailed(possibleMAtches.isEmpty())
                             .build();
-                    Runner.readWriteVerificationProtos.write(v, "Verification_" + prjct, true);
+                    TypeFactMiner.readWriteVerificationProtos.write(v, "Verification_" + prjct, true);
                     System.out.println(pretty(v.getType()) + " " + "Verified: " + v.getMatched() + "  " + "Failed: " + v.getFailed());
 
                     if (!v.getMatched() && !v.getFailed()) {

@@ -14,7 +14,7 @@ public class AnalyseProcessedCodeMappings {
 
     public static void main (String a[]){
 
-        List<ProcessedCodeMappings> processedCodeMappings = Runner.readWriteCodeMappingProtos.readAll("ProcessedCodeMapping", "CodeMapping");
+        List<ProcessedCodeMappings> processedCodeMappings = TypeFactMiner.readWriteCodeMappingProtos.readAll("ProcessedCodeMapping", "CodeMapping");
         long count = processedCodeMappings.size();
 //        List<Tuple2<Tuple2<TypeGraphOuterClass.TypeGraph, TypeGraphOuterClass.TypeGraph>, Map<String, Long>>> tciMappings =
         List<RelevantStmtMapping> tciMappings = processedCodeMappings.stream()

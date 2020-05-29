@@ -27,14 +27,14 @@ public class MineTypeMigration {
 
 
     public static void main(String a[]) throws IOException {
-        List<Project> projects = new ArrayList<>(Runner.readWriteInputProtos.
+        List<Project> projects = new ArrayList<>(TypeFactMiner.readWriteInputProtos.
                 readAll("Projects", "Project"));
 
 //        projects = projects.subList();
 
 
         List<Tuple2<Project, List<TypeChangeCommit>>> project_tcc = projects.parallelStream()
-                .map(z -> Tuple.of(z, Runner.readWriteOutputProtos.<TypeChangeCommit>readAll("TypeChangeCommit_" + z.getName(), "TypeChangeCommit")))
+                .map(z -> Tuple.of(z, TypeFactMiner.readWriteOutputProtos.<TypeChangeCommit>readAll("TypeChangeCommit_" + z.getName(), "TypeChangeCommit")))
 //            .map(x -> x.map2(l -> l.stream().filter(z -> z.getSha().equals("122cad6aec5839d8d515c5008425ecb34f2fa56b")).collect(toList())))
                 .collect(toList());
 
@@ -43,7 +43,7 @@ public class MineTypeMigration {
         Map<String, Map<TypeGraph, Double>> map = new HashMap<>();
 
         List<Tuple2<String, Set<Set<Tuple2<TypeGraph, TypeGraph>>>>> tmp = projects.stream()
-                .flatMap(p -> Runner.readWriteOutputProtos.<TypeChangeCommit>readAll("TypeChangeCommit_" + p.getName(), "TypeChangeCommit")
+                .flatMap(p -> TypeFactMiner.readWriteOutputProtos.<TypeChangeCommit>readAll("TypeChangeCommit_" + p.getName(), "TypeChangeCommit")
                         .stream()
                         .flatMap(x -> x.getMigrationAnalysisList().stream()
                                 .filter(m -> m.getTypeMigrationLevel().contains("Project")).map(t -> t.getType())
@@ -61,7 +61,7 @@ public class MineTypeMigration {
         for (var prj : projects) {
 
             Map<TypeGraph, Double> migrationRatio = new HashMap<>();
-            List<TypeChangeCommit> tcc = Runner.readWriteOutputProtos
+            List<TypeChangeCommit> tcc = TypeFactMiner.readWriteOutputProtos
                     .readAll("TypeChangeCommit_" + prj.getName(), "TypeChangeCommit");
 
             Set<String> detectedMigrations = tcc.stream()
@@ -82,7 +82,7 @@ public class MineTypeMigration {
                 if(detectedMigrations.stream().anyMatch(z -> pretty(tc.getKey()).equals(z))){
                     migrationRatio.put((tc.getKey()), 1.00);
                 }else{
-                    Try<Git> g = GitUtil.tryToClone("", Runner.projectPath.apply(prj.getName()).toAbsolutePath());
+                    Try<Git> g = GitUtil.tryToClone("", TypeFactMiner.projectPath.apply(prj.getName()).toAbsolutePath());
                     var commits = tc_commit.get(tc.getKey());
                     Tuple2<String, Integer> commitToAnalyze;
                     if(commits.size() > 1){

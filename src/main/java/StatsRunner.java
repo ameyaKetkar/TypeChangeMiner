@@ -56,16 +56,16 @@ public class StatsRunner {
 //    }
 
     public static void main(String[] args) {
-        var ppp = new ArrayList<>(Runner.readWriteInputProtos.<Project>readAll("Projects", "Project"));
+        var ppp = new ArrayList<>(TypeFactMiner.readWriteInputProtos.<Project>readAll("Projects", "Project"));
         ppp.parallelStream().forEach(z -> {
-            var xz = Tuple.of(z, Runner.readWriteOutputProtos.<TypeChangeCommitOuterClass.TypeChangeCommit>readAll("TypeChangeCommit_" + z.getName(), "TypeChangeCommit"));
-            var p = Tuple.of(xz, tryToClone(xz._1().getUrl(), Runner.projectPath.apply(xz._1().getName()).toAbsolutePath()));
+            var xz = Tuple.of(z, TypeFactMiner.readWriteOutputProtos.<TypeChangeCommitOuterClass.TypeChangeCommit>readAll("TypeChangeCommit_" + z.getName(), "TypeChangeCommit"));
+            var p = Tuple.of(xz, tryToClone(xz._1().getUrl(), TypeFactMiner.projectPath.apply(xz._1().getName()).toAbsolutePath()));
             if (p._2().isSuccess()) {
                 System.out.println("Analysing " + p._1()._1());
                 var ccc = p._1()._2().stream()
 //                        .filter(x -> x.getSha().equals("ed4ad2a431cd7c40c6f63d1107af6a350a10e462"))
                         .filter(x -> x.getTypeChangesCount() > 0).collect(Collectors.toList());
-                Set<String> alreadyAnalyzed = Runner.readWriteOutputProtos.<TheWorld>readAll("TheWorld_" + z.getName(), "TheWorld")
+                Set<String> alreadyAnalyzed = TypeFactMiner.readWriteOutputProtos.<TheWorld>readAll("TheWorld_" + z.getName(), "TheWorld")
                         .stream().map(x -> x.getSha()).collect(toSet());
                 for (var c : ccc) {
                     if (!alreadyAnalyzed.contains(c.getSha())) {
@@ -78,8 +78,8 @@ public class StatsRunner {
                                     .flatMap(x -> x.getTypeChangeInstancesList().stream()).map(x -> x.getCompilationUnit()).collect(toSet());
                             GitHistoryRefactoringMinerImpl ghi = new GitHistoryRefactoringMinerImpl();
                             Git g = p._2.get();
-                            TheWorld stats = ghi.detectCodeStats(new GitServiceImpl(), g, allJars, c.getSha(), Runner.pathToDependencies, Runner.gr, classesAffected);
-                            Runner.readWriteOutputProtos.write(stats, "TheWorld_" + p._1()._1().getName(), true);
+                            TheWorld stats = ghi.detectCodeStats(new GitServiceImpl(), g, allJars, c.getSha(), TypeFactMiner.pathToDependencies, TypeFactMiner.gr, classesAffected);
+                            TypeFactMiner.readWriteOutputProtos.write(stats, "TheWorld_" + p._1()._1().getName(), true);
                             System.out.println("---------------------=-=-------------------");
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -94,7 +94,7 @@ public class StatsRunner {
 
 
     public static Stream<JarInfoOuterClass.JarInfo> getDependencyList(String sha, String project) {
-        return Runner.readWriteInputProtos.<CommitInfo>readAll("commit_" + project, "CommitInfo")
+        return TypeFactMiner.readWriteInputProtos.<CommitInfo>readAll("commit_" + project, "CommitInfo")
                 .stream().filter(x -> x.getSha().equals(sha))
                 .map(CommitInfo::getDependenciesList).flatMap(Collection::stream);
 

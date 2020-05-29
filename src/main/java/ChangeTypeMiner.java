@@ -76,7 +76,7 @@ public class ChangeTypeMiner extends RefactoringHandler {
 
         if (refactorings.isEmpty() || refactorings.stream().noneMatch(Refactoring::isTypeRelatedChange)) {
             System.out.println("No CTT");
-            Runner.readWriteOutputProtos.write(tcc.build(), "TypeChangeCommit_"+project.getName(), true);
+            TypeFactMiner.readWriteOutputProtos.write(tcc.build(), "TypeChangeCommit_"+project.getName(), true);
             return;
         }
 
@@ -88,7 +88,7 @@ public class ChangeTypeMiner extends RefactoringHandler {
 
         if (typeChangeAnalysisList.isEmpty()) {
             System.out.println("NO Type Changes found");
-            Runner.readWriteOutputProtos.write(tcc.build(), "TypeChangeCommit_"+project.getName(), true);
+            TypeFactMiner.readWriteOutputProtos.write(tcc.build(), "TypeChangeCommit_"+project.getName(), true);
             return;
         }
 
@@ -118,7 +118,7 @@ public class ChangeTypeMiner extends RefactoringHandler {
                     + x.getTypeB4().getTypeStr() + "  ---->   " + x.getTypeAfter().getTypeStr() + "\n");
         });
 
-        Runner.readWriteOutputProtos.write(typeChangeCommit, "TypeChangeCommit_"+project.getName(), true);
+        TypeFactMiner.readWriteOutputProtos.write(typeChangeCommit, "TypeChangeCommit_"+project.getName(), true);
 
         System.out.println("-------------------------------");
         System.out.println();
@@ -169,7 +169,7 @@ public class ChangeTypeMiner extends RefactoringHandler {
 
         Set<JarInfo> allJars = concat(gc.getRequiredJars().stream(), gc.getRequiredJars().stream())
                 .collect(toSet());
-        var e = new ExtractHierarchyPrimitiveCompositionInfo(gc, allJars, Runner.pathToDependencies);
+        var e = new ExtractHierarchyPrimitiveCompositionInfo(gc, allJars, TypeFactMiner.pathToDependencies);
         TypeChangeAnalysis hierarchyPrimitiveCompositionInfo = e.extract(entry.getKey()._1(), entry.getKey()._2());
         return Optional.of(TypeChangeAnalysis.newBuilder().setB4(entry.getKey()._1()).setAftr(entry.getKey()._2())
                 .addAllTypeChangeInstances(entry.getValue())
