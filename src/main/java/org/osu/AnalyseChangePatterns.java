@@ -69,12 +69,12 @@ public class AnalyseChangePatterns {
         System.out.println(groupedTci.size());
 
         List<ProcessedCodeMappings> processedCodeMappings =
-                readWriteCodeMappingProtos.readAll("ProcessedCodeMapping", "CodeMapping");
-//                groupedTci.parallelStream()
-//                .map(Tuple::fromEntry)
-//                .map(x -> ProcessedCodeMappings.newBuilder()
-//                        .setB4(x._1()._1()).setAftr(x._1()._2()).addAllRelevantStmts(tciAnalysis(x._2())).build())
-//                .collect(toList());
+               // readWriteCodeMappingProtos.readAll("ProcessedCodeMapping", "CodeMapping");
+                groupedTci.parallelStream()
+                .map(Tuple::fromEntry)
+                .map(x -> ProcessedCodeMappings.newBuilder()
+                        .setB4(x._1()._1()).setAftr(x._1()._2()).addAllRelevantStmts(tciAnalysis(x._2())).build())
+                .collect(toList());
 
         processedCodeMappings.forEach(f -> readWriteCodeMappingProtos.write(f, "ProcessedCodeMapping", true));
 
