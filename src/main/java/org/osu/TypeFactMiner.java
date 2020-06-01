@@ -2,7 +2,6 @@ package org.osu;
 
 import com.t2r.common.models.refactorings.CommitInfoOuterClass.CommitInfo;
 import com.t2r.common.models.refactorings.ProjectOuterClass.Project;
-import com.t2r.common.models.refactorings.TypeChangeCommitOuterClass.TypeChangeCommit;
 import com.t2r.common.utilities.ProtoUtil.ReadWriteAt;
 import io.vavr.Tuple;
 import org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection;
@@ -17,7 +16,6 @@ import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Properties;
 import java.util.function.Function;
 import java.util.logging.FileHandler;
@@ -26,7 +24,6 @@ import java.util.logging.SimpleFormatter;
 
 import static com.t2r.common.utilities.GitUtil.findCommit;
 import static com.t2r.common.utilities.GitUtil.tryToClone;
-import static java.util.stream.Collectors.toList;
 import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal;
 
 public class TypeFactMiner {
@@ -76,13 +73,13 @@ public class TypeFactMiner {
     }
 
     public static void main(String[] args)  {
-       readWriteInputProtos.<Project>readAll("projects", "project").stream()
+       readWriteInputProtos.<Project>readAll("projects", "Project").stream()
                // .filter( p -> p.getName().contains("truth"))
             .map(prc -> Tuple.of(prc, readWriteInputProtos.<CommitInfo>readAll("commits_" + prc.getName(), "CommitInfo")))
             .map(x -> Tuple.of(x,tryToClone(x._1().getUrl(), projectPath.apply(x._1().getName()).toAbsolutePath())))
             .forEach(p -> {
-                List<String> analyzedCommits = readWriteOutputProtos.<TypeChangeCommit>readAll("TypeChangeCommit_" + p._1()._1().getName(), "TypeChangeCommit")
-                        .stream().map(x -> x.getSha()).collect(toList());
+                //List<String> analyzedCommits = readWriteOutputProtos.<TypeChangeCommit>readAll("TypeChangeCommit_" + p._1()._1().getName(), "TypeChangeCommit")
+                  //      .stream().map(x -> x.getSha()).collect(toList());
                 if (p._2().isSuccess()){
                     System.out.println("Analysing " + p._1()._1());
                     p._1()._2().stream().filter(x->x.getRefactoringsCount() > 0 && x.getIsTypeChangeReported())
