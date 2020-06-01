@@ -33,6 +33,7 @@ import static com.t2r.common.utilities.PrettyPrinter.prettyName;
 import static gr.uom.java.xmi.TypeFactMiner.TypeGraphUtil.getTypeGraph;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.*;
+import static org.osu.TypeFactMiner.readWriteCodeMappingProtos;
 
 public class AnalyseChangePatterns {
 
@@ -68,14 +69,14 @@ public class AnalyseChangePatterns {
         System.out.println(groupedTci.size());
 
         List<ProcessedCodeMappings> processedCodeMappings =
-                TypeFactMiner.readWriteCodeMappingProtos.readAll("ProcessedCodeMapping", "CodeMapping");
+                readWriteCodeMappingProtos.readAll("ProcessedCodeMapping", "CodeMapping");
 //                groupedTci.parallelStream()
 //                .map(Tuple::fromEntry)
 //                .map(x -> ProcessedCodeMappings.newBuilder()
 //                        .setB4(x._1()._1()).setAftr(x._1()._2()).addAllRelevantStmts(tciAnalysis(x._2())).build())
 //                .collect(toList());
 
-//        processedCodeMappings.forEach(f -> Runner.readWriteCodeMappingProtos.write(f, "ProcessedCodeMapping", true));
+        processedCodeMappings.forEach(f -> readWriteCodeMappingProtos.write(f, "ProcessedCodeMapping", true));
 
 
         List<Tuple2<Tuple2<TypeGraph, TypeGraph>, RelevantStmtMapping>> tciMappings = processedCodeMappings.stream()
