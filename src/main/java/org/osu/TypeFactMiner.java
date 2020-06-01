@@ -76,7 +76,7 @@ public class TypeFactMiner {
     }
 
     public static void main(String[] args)  {
-       readWriteInputProtos.<Project>readAll("Projects", "Project").stream()
+       readWriteInputProtos.<Project>readAll("projects", "project").stream()
                // .filter( p -> p.getName().contains("truth"))
             .map(prc -> Tuple.of(prc, readWriteInputProtos.<CommitInfo>readAll("commits_" + prc.getName(), "CommitInfo")))
             .map(x -> Tuple.of(x,tryToClone(x._1().getUrl(), projectPath.apply(x._1().getName()).toAbsolutePath())))
