@@ -49,7 +49,7 @@ public class AnalyseChangePatterns {
 
 //        List<ProcessedCodeMappings> processedCodeMappings = Runner.readWriteCodeMappingProtos.readAll("ProcessedCodeMapping", "CodeMapping");
 
-        ArrayList<Project> projects = new ArrayList<>(TypeFactMiner.readWriteInputProtos.<Project>readAll("Projects", "Project"));
+        ArrayList<Project> projects = new ArrayList<>(TypeFactMiner.readWriteInputProtos.<Project>readAll("projects", "Project"));
 
         List<Tuple2<Project, List<TypeChangeCommit>>> procect_tcc = projects.stream()
                 .map(z -> Tuple.of(z, TypeFactMiner.readWriteOutputProtos.<TypeChangeCommit>readAll("TypeChangeCommit_" + z.getName(), "TypeChangeCommit")))
