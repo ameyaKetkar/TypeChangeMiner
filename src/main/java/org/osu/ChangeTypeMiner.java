@@ -154,7 +154,6 @@ public class ChangeTypeMiner extends RefactoringHandler {
                 .collect(toMap(x -> x._1(), x -> x._2()));
     }
 
-
     private Optional<TypeChangeAnalysis> performAndGetTypeChangeAnalysis(Entry<Tuple2<TypeGraph, TypeGraph>, Set<TypeChangeInstance>> entry, GlobalContext gc
             , CodeStatistics cs) {
 
