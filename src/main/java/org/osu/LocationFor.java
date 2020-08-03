@@ -1,4 +1,4 @@
-package org.refactoringminer;
+package org.osu;
 
 import java.security.MessageDigest;
 

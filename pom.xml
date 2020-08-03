@@ -197,6 +197,13 @@
             <systemPath>${basedir}/lib/core-2.1.3-SNAPSHOT.jar</systemPath>
             <scope>system</scope>
         </dependency>
+        <dependency>
+            <groupId>MigrationMiner</groupId>
+            <artifactId>MigrationMiner</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <systemPath>${basedir}/lib/MigrationMiner-1.0-SNAPSHOT-jar-with-dependencies.jar</systemPath>
+            <scope>system</scope>
+        </dependency>
 <!--        <dependency>-->
 <!--            <groupId>gumtree</groupId>-->
 <!--            <artifactId>cleint</artifactId>-->
