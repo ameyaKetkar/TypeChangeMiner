@@ -10,3 +10,6 @@
 [submodule "gumtree"]
 	path = gumtree
 	url = https://github.com/ameyaKetkar/gumtree.git
+[submodule "MigrationMiner"]
+	path = MigrationMiner
+	url = https://github.com/ameyaKetkar/MigrationMiner.git
