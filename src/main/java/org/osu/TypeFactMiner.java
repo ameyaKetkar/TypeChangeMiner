@@ -74,7 +74,7 @@ public class TypeFactMiner {
             pathToCorpus = pathToSetup.getParent().resolve(prop.getProperty("PathToCorpus"));
             projectList = pathToCorpus.resolve(prop.getProperty("InputProjects"));
             projectPath = p -> pathToCorpus.resolve("Project_"+p).resolve(p);
-            epochStart = new SimpleDateFormat("YYYY-mm-dd").parse(prop.getProperty("epoch"));
+            epochStart = new SimpleDateFormat("yyyy-MM-dd").parse(prop.getProperty("epoch"));
             outputFolder = pathToSetup.resolve(prop.getProperty("PathToOutput"));
             pathToInput = pathToSetup.resolve(prop.getProperty("PathToInput"));
             readWriteInputProtos = new ReadWriteAt(pathToInput.resolve("ProtosOut"));

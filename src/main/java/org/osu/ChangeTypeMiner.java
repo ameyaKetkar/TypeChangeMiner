@@ -21,7 +21,6 @@ import gr.uom.java.xmi.TypeFactMiner.ExtractHierarchyPrimitiveCompositionInfo;
 import gr.uom.java.xmi.TypeFactMiner.GlobalContext;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
-import org.osu.TypeFactMiner;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringHandler;
 import org.refactoringminer.api.TypeRelatedRefactoring;
@@ -134,6 +133,7 @@ public class ChangeTypeMiner extends RefactoringHandler {
     }
 
     private List<TypeChangeAnalysis> getTypeChangeAnalyses(Tuple2<GlobalContext, GlobalContext> globalContexts, List<TypeRelatedRefactoring> typeRelatedRefactorings, CodeStatistics cs) {
+
         Map<Tuple2<TypeGraph, TypeGraph>, Set<TypeChangeInstance>> groupedTypeChanges = typeRelatedRefactorings
                 .stream()
                 .flatMap(x -> {
