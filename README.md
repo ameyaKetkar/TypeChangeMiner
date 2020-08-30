@@ -1,6 +1,6 @@
 TypeChangeMiner
 =================
- TypeFactMiner - a tool written in Java, can detect the type changes applied in the history of a Java Project.
+ TypeChangeMiner - a tool written in Java, can detect the type changes applied in the history of a Java Project.
  
  An example of a type change is: 
  
@@ -24,7 +24,7 @@ TypeChangeMiner
  
  # How to use TypeChangeMiner
  ## Prerequisites of TypeChangeMiner:
- * Java 11 +
+ * Java 11 or above 
  * python 3 
  * maven
  
