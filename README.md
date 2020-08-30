@@ -73,7 +73,7 @@ TypeChangeMiner
  
  # Exploring the results of TypeChangeMiner
 
- The results can be downloaded from [here]().
+ The results can be downloaded from [here](Dataset.zip).
  The results contain two JSON files. Format of commitInfo.json is:
  The details of each commit(where a type change is performed), can be found in `commitInfo.json`.
  Its format is: 
