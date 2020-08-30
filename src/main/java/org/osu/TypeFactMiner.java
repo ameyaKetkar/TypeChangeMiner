@@ -70,8 +70,8 @@ public class TypeFactMiner {
             prop = new Properties();
             InputStream input = new FileInputStream("paths.properties");
             prop.load(input);
-            pathToSetup=Paths.get(prop.getProperty("PathToSetup")).resolve("TypeChangeMiner");
-            pathToCorpus = pathToSetup.getParent().resolve(prop.getProperty("PathToCorpus"));
+            pathToSetup=Paths.get(prop.getProperty("PathToSetup"));
+            pathToCorpus = pathToSetup.resolve(prop.getProperty("PathToCorpus"));
             projectList = pathToCorpus.resolve(prop.getProperty("InputProjects"));
             projectPath = p -> pathToCorpus.resolve("Project_"+p).resolve(p);
             epochStart = new SimpleDateFormat("yyyy-MM-dd").parse(prop.getProperty("epoch"));
