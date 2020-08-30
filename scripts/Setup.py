@@ -3,6 +3,7 @@ import boto3
 from botocore import UNSIGNED
 from botocore.client import Config
 import os
+import sys
 
 
 def setupAt(pathToSetup):
@@ -72,6 +73,4 @@ def downloadGremlinServer(typechangestudy):
             print('Unzip complete')
 
 
-
-
-setupAt('C:\\Users\\t-amketk\\TypeChangeStudy')
+setupAt(sys.argv[1])

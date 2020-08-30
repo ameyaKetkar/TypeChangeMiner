@@ -2,7 +2,7 @@ from RW import readAll
 import os
 import json
 from PrettyPrint import pretty, prettyJarInfo, prettyNameSpace1, prettyElementKind
-
+import sys
 #pathToRawData = r"C:\Users\t-amketk\RawData\RawData"
 
 
@@ -28,7 +28,8 @@ def get_dependency_affected(commitInfo):
     return deps
 
 
-def convert(pathToSetup, pathToJson):
+def convert(pathToSetup):
+    pathToJson = pathToSetup
     commits = {}
     typeChangeDict = {}
 
@@ -98,4 +99,4 @@ def convert(pathToSetup, pathToJson):
         json.dump(typeChangeDict, outfile)
 
 
-convert('C:\\Users\\t-amketk\\TypeChangeStudy', 'C:\\Users\\t-amketk\\TypeChangeStudy')
+convert(sys.argv[1])

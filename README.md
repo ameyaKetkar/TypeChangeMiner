@@ -1,7 +1,9 @@
 TypeChangeMiner
 =================
  TypeFactMiner is a tool written in Java, can detect the type changes applied in the history of a Java Project.
+ 
  An example of a type change is: 
+ 
  ![Example](images/typeChangeExample.PNG)
  
  TypeChangeMiner is developed as the part of the empirical study : [Understanding Type Changes in Java](https://users.encs.concordia.ca/~nikolaos/publications/FSE_2020.pdf).
