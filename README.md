@@ -19,8 +19,8 @@ TypeChangeMiner
    * the libraries introduced, updated or removed in the commit history of a maven project
  
  We have also collected such fine-grained information by mining 450,000 commits in 130 highly rated java projects.
- Our data set is available [here]().
- [Here]() is the description of our dataset along with some instruction to explore it.
+ Our data set is available in [Dataset.zip](Dataset.zip). Its description can be found below.
+ 
  
  # How to use TypeChangeMiner
  ## Prerequisites of TypeChangeMiner:
