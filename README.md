@@ -1,6 +1,6 @@
 TypeChangeMiner
 =================
- TypeFactMiner is a tool written in Java, can detect the type changes applied in the history of a Java Project.
+ TypeFactMiner - a tool written in Java, can detect the type changes applied in the history of a Java Project.
  
  An example of a type change is: 
  
@@ -9,10 +9,10 @@ TypeChangeMiner
  TypeChangeMiner is developed as the part of the empirical study : [Understanding Type Changes in Java](https://users.encs.concordia.ca/~nikolaos/publications/FSE_2020.pdf).
  
  TypeChangeMiner is a built upon the widely used RefactoringMiner project, that detects 43 types of refactorings applied in the history of a project.
- TypeChangeMiner provides fine-grained detailed insight into transformations 
+ TypeChangeMiner provides fine-grained detailed insight into the transformations 
  `Change Variable Type`, `Change Field Type`, `Change Parameter Type` and `Change Method Return Type`.
- This tool analyses the project and resolves type bindings of variable and method declarations, without building (or compiling) the project.
- Using such detailed information it provides fine-grained details like :
+ This tool can analyse a commit and resolve the type bindings of variable and method declarations (in the commit), without building the project.
+ Using such detailed information it provides fine-grained details about a type change, like :
  * fully-qualified names of the types involved in the type change
  * the adaptations performed for applying the type change (e.g. updating callsites or initializers)
  * the third-party libraries used by the projects
